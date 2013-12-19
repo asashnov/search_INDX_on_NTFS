@@ -18,11 +18,11 @@ def args_parse():
     global image_file, index_file
 
     if len(sys.argv) != 3:
-        printf >>sys.stderr, """Error: invalid usage.
-Usage: %s <NTFS_disk_image>  <INDX_list>
+        print >>sys.stderr, """Error: invalid usage.
+Usage: %s <NTFS_disk_image>  <INDX_list_file>
 
 Where <NTFS_disk_image> is a device file or dd/ddrescue image file and
-<INDX_list> is a text file with one number per line with 512 bytes sectors
+<INDX_list_file> is a text file with one number per line with 512 bytes sectors
 starting with 'INDX' text (NTFS directory index file)
         """
         return False
