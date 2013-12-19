@@ -67,18 +67,23 @@ def do_job():
         # read INDX from disk and store to tmp file
         f.seek(s * SEC_SIZE)
         indx = f.read(1024*1024)  # FIXME: I do not know how to detect the end of INDX
-        tmpfile = tempfile.NamedTemporaryFile(prefix="ntfs_indx_")
+        tmp = tempfile.NamedTemporaryFile(prefix="ntfs_indx_")
         tmp.write(indx)
         tmp.flush()
 
         # Parse record-by-record filling directory tree
         p = subprocess.Popen(
-            args = [ WISP, '-valid', '-csv', '-base10', '-indxfile', image_file ]
+            shell=False,
+            args = [ WISP, '-valid', '-csv', '-base10', '-indxfile', tmp.name ],
+            stdout = subprocess.PIPE
             )
-        p.run()
 
-        for line in p:
-            print line
+        for line in p.stdout:
+            print line.strip()
+
+        print "----------"
+
+
         p.wait()
 
 
