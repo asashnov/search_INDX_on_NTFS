@@ -1,0 +1,883 @@
+<html>
+
+<head>
+    <title>Windows INDX Slack Parser (wisp) readme</title>
+    <style type="text/css">
+        div
+        {
+            margin-left: 1em;
+        }
+    </style>
+</head>
+
+<body bgcolor="white"">
+
+<h2 align="center"><a name="index">Windows INDX Slack Parser - <i>wisp</i></a></h2>
+<h3 align="center">(version 0.20)<br /><br /></h3>
+<h3 align="center"><font color="red">WARNING:<br />
+Do NOT modify this file in any way OR rename the file. <br />
+Doing so will invalidate the binary authentication.</font></h3> <br />
+
+<hr />
+
+<ul>
+    <li> <a href="#eula"> End User's License Agreement (EULA) </a></li>
+
+    <li> <a href="#about"> About the <b><i>wisp</i></b> Tool </a></li>
+    <li> <a href="#howto">How to use this Tool</a></li>
+    <ul>
+        <li> <a href="#live_vol">Parsing a Live Volume</a></li>
+        <li> <a href="#offline_vol">Parsing an Image File off-line</a></li>
+        <li> <a href="#mounted">Parsing a NTFS Volume Mounted on Linux or Mac OS-X</a></li>
+        <li> <a href="#vmware_vol">Parsing a VMWare volume</a></li>
+        <li> <a href="#ntfscopy">Extracting Clusters Associated with a Deleted Entry</a></li>
+        <li> <a href="#nodups">Eliminating the Duplicates</a></li>
+        <li> <a href="#output_options">Output Options</a></li>
+    </ul>
+    <li> <a href="#issues">Known Issues</a></li>
+    <li> <a href="#options">List of Options</a></li>
+    <li> <a href="#auth"> Authentication and License File </a></li>
+    <li> <a href="#version_history"> Version history </a></li>
+    <li> <a href="#references"> References </a></li>
+</ul>
+
+<hr/><!---------------------EULA---------------------->
+<h2><a name="eula">END USER LICENSE AGREEMENT (EULA)</a><br />
+<font size="3">for software on TZWorks, LLC Website <a href="http://www.tzworks.net">www.tzworks.net</a></font></h2>
+
+<h3>USER AGREEMENT</h3>
+<div>
+<p>Permission to use the TZWorks, LLC website (&quot;Website&quot;) and downloadable software 
+that is made available on the Website (&quot;Software&quot;) is for <b>non-commercial, demonstrational 
+use ONLY</b>. The User Agreement, Disclaimer, Website and/or Software may change from time to 
+time.  By continuing to use the Website or Software after those changes become effective, you 
+agree to be bound by all such changes.  Permission to use the Website and Software is granted 
+provided that (1) use of such Website and Software is for <b>non-commercial, demonstrational use 
+only</b> and (2) the Website and Software is not resold, transferred or distributed to any 
+other person or entity.  <i><font color="red">To use the Software for commercial or business purposes, a 
+separate license is required.</font></i> Contact TZWorks, LLC 
+(<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>) 
+for more information regarding licensing. To redistribute the Software, approval in writing 
+is required from TZWorks, LLC.  These terms do not give the user any rights in intellectual 
+property or technology, but only a limited right to use the Software for <b>non-commercial, 
+demonstrational use</b>.  TZWorks, LLC retains all rights to ownership of all software and content 
+ever made available on its Website.</p>
+</div>
+
+<h3>DISCLAIMER</h3>
+<div>
+<p>The user agrees that all Software made available on the Website is experimental in nature 
+and use of Website and Software is at user's sole risk.  The Software could include technical 
+inaccuracies or errors.  Changes are periodically added to the information herein, and TZWorks, 
+LLC may make improvements and/or changes to Software at any time.  TZWorks, LLC makes no 
+representations about the accuracy or usability of the Software and/or Website for any purpose.</p>
+
+<p>ALL SOFTWARE ARE PROVIDED &quot;AS IS&quot; AND &quot;WHERE IS&quot; WITHOUT WARRANTY 
+OF ANY KIND INCLUDING ALL IMPLIED WARRANTIES AND CONDITIONS OF MERCHANTABILITY, FITNESS 
+FOR ANY PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT.  IN NO EVENT SHALL TZWORKS, LLC 
+BE LIABLE FOR ANY KIND OF DAMAGE RESULTING FROM ANY CAUSE OR REASON, ARISING OUT OF IT 
+IN CONNECTION WITH THE USE OR PERFORMANCE OF INFORMATION AVAILABLE FROM THIS WEBSITE. </p>
+</div>
+
+<h3>PRIVACY POLICY</h3> 
+<div>
+<p>When you use the Website or download the Software, we automatically record information regarding 
+your activity using the Website.  This may include the Internet Protocol (&quot;IP&quot;) address and date 
+and time stamps associated with transactions.  Personal information and identifiable data is only 
+collected if you supply it to TZWorks, LLC by posting a comment on the Website or submitting an 
+email.  We do not disclose any personally identifiable information without your permission unless 
+we are legally entitled or required to do so or if we believe that such action is necessary to 
+protect and/or defend our rights, property or personal safety and those of our users/customers etc.</p>
+</div>
+
+<h3>SECURITY</h3>
+<div>
+<p>The Website has security measures in place to protect the loss, misuse, and/or alteration of 
+information under our control. The data resides behind a firewall, with access restricted to 
+authorized TZWorks, LLC personnel.  If you believe the Website and or its software has been misused 
+or has had a security breach please email <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>.  
+We will not be responsible for such misuse and not guarantee that we will rectify any such security breach. </p>
+</div>
+
+<h3>REMOVAL</h3>
+<div>
+<p>The Website and Software are the original works of TZWorks, LLC.  However, to be in compliance with 
+the Digital Millennium Copyright Act of 1998 (&quot;DMCA&quot;) we agree to investigate and disable any 
+material for infringement of copyright. Contact TZWorks, LLC at email address: 
+<a href="mailto:info@tzworks.net">info&#64;tzworks.net</a>, regarding any DMCA concerns. </p>
+</div>
+
+<!-- 
+This is section is commented out, since it is only used by the tool binary
+
+USER_AGREEMENT_START
+-------------------------------- User Agreement -----------------------------
+
+Permission to use the TZWorks, LLC website ("Website") and downloadable 
+software that is made available on the Website ("Software") is for non-
+commercial, demonstrational use ONLY. The User Agreement, Disclaimer, Website 
+and/or Software may change from time to time.  By continuing to use the 
+Website or Software after those changes become effective, you agree to be 
+bound by all such changes.  Permission to use the Website and Software is 
+granted provided that (1) use of such Website and Software is for non-
+commercial, demonstrational use only and (2) the Website and Software is not 
+resold, transferred or distributed to any other person or entity.  To 
+use the Software for commercial or business purposes, a separate license 
+is required. Contact TZWorks, LLC (info@tzworks.net) for more information 
+regarding licensing. To redistribute the Software, approval in writing 
+is required from TZWorks, LLC.  These terms do not give the user any 
+rights in intellectual property or technology, but only a limited right 
+to use the Software for non-commercial, demonstrational use.  TZWorks, LLC 
+retains all rights to ownership of all software and content ever made 
+available on its Website.
+USER_AGREEMENT_END
+
+DISCLAIMER_START
+---------------------------------- DISCLAIMER -------------------------------
+
+The user agrees that all Software made available on the Website is
+experimental in nature and use of Website and Software is at user's sole
+risk.  The Software could include technical inaccuracies or errors.  Changes
+are periodically added to the information herein, and TZWorks, LLC may make
+improvements and/or changes to Software at any time.  TZWorks, LLC makes no
+representations about the accuracy or usability of the Software and/or
+Website for any purpose.  All software are provided "AS IS" and "WHERE IS"
+without warranty of any kind including all implied warranties and conditions
+of merchantability, fitness for any particular purpose, title and non-
+infringement.  In no event shall TZWorks, LLC be liable for any kind of 
+damage resulting from any cause or reason, arising out of it in connection
+with the use or performance of information available from this Website.
+DISCLAIMER_END
+-->
+
+
+
+
+<hr/><!---------------------About the <b><i>wisp</i></b> Tool---------------------->
+<h2><a name="about">About the <b><i>wisp</i></b> Tool</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>          
+<b><i>wisp</i></b> is a command line version of a Windows parser that targets 
+NTFS index type attributes.  The NTFS index attribute points 
+to one or more <i>INDX</i> records.  These records contain index 
+entries that are used to account for each item in a directory. 
+An index item represents either a file or a subdirectory and 
+includes enough metadata to contain the name, modified/access/MFT 
+changed/birth (<i>MACB</i>) timestamps, size (if it is a file vice 
+subdirectory), as well as MFT entry numbers of the item and 
+its parent.   The <b><i>wisp</i></b> tool, in its simplest form, is able 
+to walk these structures, read the metadata, and report which 
+index entries are present.</p>
+
+<p>  
+As a directory's contents are changed, the number of valid 
+index entries grows or shrinks, as appropriate.   As more 
+directory entries are added, eventually it will exceed the 
+existing <i>INDX</i> record allocation space.  At this point the 
+operating system will allocate an additional <i>INDX</i> record in 
+the size of 0x1000 byte chunk.  Conversely, when entries are 
+removed from the directory, the <i>INDX</i> record space is not 
+necessarily deallocated.  Thus, anytime the number of index 
+entries shrinks, the invalid ones potentially can be harvested
+from the <i>slack</i> space.  The <i>slack</i> space is defined to be the 
+allocated but unused space.  By comparing both the valid 
+entries and those still in the <i>slack</i> space, one can make 
+some inferences about whether a file (or subdirectory) was 
+present in the past.</p>     
+
+<p>  
+A good tutorial on harvesting index entries from INDX slack space 
+can be found on Willi Ballenthin's webpage 
+<a href="http://www.williballenthin.com/forensics/indx/index.html">[4]</a> 
+and his DFIRonline presentation 
+<a href="http://writeblocked.org/dfironline.html">[5]</a>.</p>  
+
+<p>  
+<b><i>wisp</i></b> uses the NTFS and index attribute parsing engine that 
+is used in the <b><i>ntfswalk</i></b> tool 
+<a href="http://tzworks.net/prototype_page.php?proto_id=12">[6]</a> 
+available from the <i>TZWorks 
+LLC</i> website.  Currently there are compiled versions for 
+Windows, Linux and Mac OS-X.</p>
+
+<p>To use this tool, an authentication file is required to be in the same 
+directory as the binary for the tool to run.  The non-commercial/demonstrational-use 
+EULA is part of this readme. It only activates certain capabilities of the 
+tool and is meant only for demonstration purposes.  This authentication will 
+eventually expire.  To activate all the functionality of the tool and use 
+it on a permanent basis, a separate business license needs to be purchased. 
+Contact <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a> for more 
+details about the using this tool for business and/or casework use.</p>
+</div>
+
+<hr/><!---------------------How to use this Tool---------------------->
+<h2><a name="howto">How to use this Tool</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p> 
+While the <b><i>wisp</i></b> tool doesn't require one to run with 
+administrator privileges, without doing so will restrict 
+one to only looking at off-line <i>'dd'</i> images.  Therefore 
+to perform <i>live</i> processing of volumes, one needs to launch
+the command prompt with administrator privileges.</p> 
+
+<p> 
+One can display the menu options by typing in the 
+executable name with no parameters.  From the available 
+options, one can process NTFS <i>INDX</i> records with a 
+handful of 'use-cases'.  Specifically, <b><i>wisp</i></b> allows 
+processing from any of these sources: (a) <i>live</i> volume, 
+(b) <i>'dd'</i> type image, (c) <i>VMWare</i> volume or (d) separately 
+extracted <i>INDX</i> type record.</p> 
+
+<p> 
+After selecting the source of the data, one can either: (a)
+process a single directory on the file system, (b) recursively 
+process the subdirectories to some specified level, or 
+(c) process all the index entries in an entire volume.  
+Processing every directory in the entire volume is not 
+explicitly shown in the above menu since it is the 
+default option.</p>    
+
+<p> 
+If one only wants a certain type of index entry, one 
+can select: (a) just show valid index entries, (b) just 
+show index entries in the <i>slack</i> space, or (c) both.  
+For default output, one can select nothing.  This will output 
+the data in unstructured text.  If parsable output is desired 
+(or something that can be displayed in a spreadsheet application), 
+one can select from 3 options that allow for structured output  (CSV, 
+<i><a href="http://log2timeline.net/">log2timeline</a></i> CSV, 
+or 
+<i><a href="http://wiki.sleuthkit.org/index.php?title=Body_file">SleuthKit body-file</a></i>).  
+The other useful option is 
+the 'no duplicates' choice to minimize any redundancy 
+in the output.</p> 
+</div>
+
+<hr/><!---------------------Parsing a Live Volume---------------------->
+<h2><a name="live_vol">Parsing a Live Volume</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>
+To parse <i>INDX</i> entries from a <i>live</i> NTFS volume (or 
+partition), one has two choices: (a) specify the 
+volume directly by using the <font color="red">-partition &lt;drive letter&gt;</font> 
+option or (b) specify the drive number and volume 
+offset by using the <font color="red">-drivenum &lt;num&gt; -offset &lt;volume 
+offset&gt;</font> option.  Either choice accomplishes the same 
+task.  The first choice is more straightforward and 
+easier to use.  The second choice, while more complex, 
+allows one to target hidden NTFS partitions that do 
+not have a drive letter.</p>  
+
+<p>
+The next step is to decide what you want to target.  The choices are:  
+(a) a specific directory on the file system (specified 
+by either the <font color="red">-mft</font> or <font color="red">-path</font> options), (b) a collection 
+of subdirectories within a directory (how deep you wish to go is specified by 
+the <font color="red">-level</font> option) or (c) all directories (specified 
+by the <font color="red">-scanall</font> option).  A couple examples are shown below:</p>
+
+<pre>
+    <b><i>wisp</i></b> -partition c -path c:\$Recycle.Bin -level 2 -all -csv &gt; results1.csv
+    <b><i>wisp</i></b> -drivenum 0 -offset 0x100000 -all -csv &gt; results2.csv
+</pre>
+
+<p>
+The first example targets the hidden directory of 
+c:\$Recycle.Bin, and the <font color="red">-level 2</font> switch tells <b><i>wisp</i></b> to 
+include any subdirectory in the analysis, up to 2 levels 
+deep.   The <font color="red">-all</font> switch means both valid and invalid 
+(<i>slack</i>) entries will be included in the output.  Finally, 
+the output is redirected to a file and the format is CSV.</p>
+
+<p>
+The second example uses the same output options as the 
+first, but now targets the first physical hard drive.  
+The hex value 0x100000 is specified as the offset to 
+the volume (or partition) we wish to analyze.  For this 
+example, this happens to be the hidden partition created 
+during a Windows 7 installation.   Since there is no 
+<font color="red">-mft</font> or <font color="red">-path</font> options explicitly listed, the implication 
+to <b><i>wisp</i></b> is we want to traverse the entire volume parsing 
+all <i>INDX</i> records associated with the volume.</p>  
+</div>
+
+<hr/><!---------------------Parsing an Image File off-line---------------------->
+<h2><a name="offline_vol">Parsing an Image File off-line</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>
+To process an image that has been already acquired and is 
+in the <i>'dd'</i> format, one uses the <font color="red">-image</font> switch.  This option 
+can be used in two flavors.  If the image is of an entire 
+drive then one needs to explicitly specify the offset of 
+the location of the volume you wish to target.  On the other 
+hand, if the image is only of a volume, then you do not 
+need to specify the offset of the volume (since it is 
+presumed to be at offset 0).   </p>  
+
+<p>
+For the first case, where 
+an offset needs to be explicitly specified, <b><i>wisp</i></b> will help 
+the user in locating where the NTFS volume offsets are.
+If one just issues the <font color="red">-image</font> command without the offset, 
+and there is not a NTFS volume at offset 0 (eg. second 
+case mentioned above), <b><i>wisp</i></b> will proceed to look at the 
+master boot record contained in the image, determine where the NTFS partitions 
+are, and report them to the user.  This behavior was meant 
+to be an aid to the user so that one does not need to 
+resort to other tools to determine where the offsets for 
+the NTFS volumes are in an image. </p>  
+
+
+<p>
+Another nuance with using images as the source, is when 
+specifying a path to a directory within the image to analyze, 
+using the <font color="red">-path</font> option.   Since the image is not mounted as 
+a drive, one really should not associate it with a drive 
+letter when specifying the path.  If one does do this, <b><i>wisp</i></b> 
+will ignore the drive letter and proceed to try to find the 
+path starting at the root directory which is at MFT entry 5 
+for NTFS volumes.</p> 
+
+<p>
+Below are two examples of processing <i>'dd'</i> type images:  
+(a) the first analyzes an entire volume at drive offset 
+0x100000 hex and (b) the second analyzes an image of a volume 
+starting at the path "Users".</p>  
+
+<pre>
+    <b><i>wisp</i></b> -image c:\dump\my_image.dd -offset 0x100000 -all -csv &gt; results1.csv
+    <b><i>wisp</i></b> -image c:\dump\vol_image.dd -path "\Users" -level 5 -all -csv &gt; results2.csv
+</pre>
+
+<p>
+While the first example traverses the entire volume, the 
+second starts at the "Users" directory and 
+recursively processes the subdirectories up to 5 levels deep.  
+Notice the second example does not specify an offset, since 
+the image is of a volume (meaning the volume starts at offset 
+0) while the first is an image of a drive and the first NTFS 
+volume starts at offset 0x100000 hex.</p>
+
+<p>
+Both examples extract valid and invalid index entries as 
+well as redirect their output to a file using CSV formatting.</p>
+</div>
+
+<hr/><!---------------------Parsing a NTFS Volume Mounted on Linux or Mac OS-XParsing a VMWare volume---------------------->
+<h2><a name="mounted">Parsing a NTFS Volume Mounted on Linux or Mac OS-X</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>
+Sometimes you do not have a '<i>dd</i>' image of a volume or drive, but instead have the 
+physical hard drive available you 
+wish to analyze.  If you are running <b><i>wisp</i></b> in Windows, then one can mount
+the physical dirve and proceed to follow the 
+guidelines in the earlier section for parsing a <i>live</i> volume.  However, 
+if you are running <b><i>wisp</i></b> in Linux or Mac OS-X, you should also be 
+able to mount the target drive as well. Once it is successfully mounted, 
+one uses the 
+<font color="red">-image &lt;device name of drive or volume&gt; -offset 
+&lt;offset to desired volume, if a drive&gt;</font> option to access the 
+appropriate NTFS volume.  Below is an example of how to do this using a Mac box.  </p>
+
+<p>
+Assuming one has the proper setup with write blocker and hard drive 
+shuttle, after connecting the Windows drive to the Mac, one can 
+issue the <b><i>diskutil list</i></b> command to enumerate all the drives and 
+volumes mounted on the machine. For this example, lets also assume the 
+drive that we mounted was labeled as /dev/disk1 and its 
+NTFS partition was /dev/disk1s1.  From this data one could issue the following
+command to <b><i>wisp</i></b> to analyze the partition.</p>
+
+<pre>
+    sudo <b><i>wisp</i></b> -image /dev/<font color="red">r</font>disk1s1 -all -csv -nodups &gt; out.csv
+</pre>
+
+Notice the '<i>sudo</i>' in front of the <b><i>wisp</i></b> command.  This 
+will allow <b><i>wisp</i></b> to run with administrator privileges to access 
+the raw drive.  Also note <i>/dev/<font color="red">r</font>disk1s1</i> 
+is used.  The '<font color="red">r</font>' (which is unique to Mac, in this case) is used 
+to specify we want to 
+access the drive as <i>raw</i> I/O as opposed to <i>buffered</i> I/O. Buffered
+I/O is nice for normal reads and/or writes, but it is much slower when 
+traversing in chunks aligned on sector boundaries.
+
+<p>
+Linux is similar to Mac, but instead of using the <b><i>diskutil</i></b> 
+tool, one would use the <b><i>df</i></b> tool to enumerate the mounted 
+devices.</p>
+</div>
+
+<hr/><!---------------------Parsing a VMWare volume---------------------->
+<h2><a name="vmware_vol">Parsing a VMWare volume</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>
+Occasionally it is useful to analyze a <i>VMWare</i> image containing 
+a Windows volume, both from a forensics standpoint as well as 
+from a testing standpoint.  This option is still considered 
+experimental since it has only been tested on a handful of 
+configurations.  Furthermore, this option is limited to monolithic 
+type <i>VMWare</i> images versus split images.   In <i>VMWare</i>, the term 
+split image means the volume is separated into multiple files, 
+while the term monolithic virtual disk is defined to be a 
+virtual disk where everything is kept in one file.  There 
+may be more than one VMDK file in a monolithic architecture, 
+where each monolithic VMDK file would represent a separate 
+snapshot.  More information about the monolithic virtual 
+disk architecture can be obtained from the <i>VMWare</i> website 
+<a href="http://www.vmware.com">[10]</a>.</p>
+
+<p>
+When working with virtual machines, the capability to 
+handle snapshot images is important.  Thus, if processing a 
+<i>VMWare</i> snapshot, one needs to include the snapshot/image 
+as well as its inheritance chain.</p>   
+
+<p>
+To handle an inheritance chain, <b><i>wisp</i></b> can handle 
+multiple VMDK files by listing all the vmdk files separated by
+a pipe character and enclosed in double quotes.
+(eg. <font color="red">-vmdk "&lt;VMWare NTFS virtual disk-1&gt; | ... | 
+&lt;VMWare NTFS virtual disk-x&gt;"</font>).</p>
+
+<p>
+Aside from the VMDK inheritance chain, everything else is the 
+same when using this option to that of normal <i>'dd'</i> type 
+images discussed in the previous section.</p>
+</div>
+
+<hr/><!---------------------Extracting Clusters Associated with a Deleted Entry---------------------->
+<h2><a name="ntfscopy">Extracting Clusters Associated with a Deleted Entry</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>
+At this point in the analysis, one may want to go deeper and 
+try to find if the deleted file is still available by trying 
+to find the '<i>cluster run</i>' data associate with the MFT entry.  
+Since the <i>INDX</i> records do not have any <i>cluster run</i> data 
+associated with an index entry, one would need to use the MFT 
+entry specified and then use some other tool to read the file 
+record associated with that MFT entry.  One could extract the 
+data either from the local volume or from the volume shadow 
+copy store.  If pulling from the local volume, one can use 
+the <b><i>ntfscopy</i></b> utility 
+<a href="http://tzworks.net/prototype_page.php?proto_id=9">[7]</a> 
+from <i>TZWorks</i>.  This tool will allow 
+one to (a) input a volume (live or off-line), (b) specify the 
+desired MFT entry to copy from and (c) output the extract the 
+data associated with the MFT's <i>cluster run</i> as well as the 
+metadata associated with that MFT entry.   Below is an 
+example of doing this with <b><i>ntfscopy</i></b> using the MFT entry 
+number 645130, which is for the <i>slack</i> entry shown above.</p> 
+
+<pre>
+    <b><i>ntfscopy</i></b> -mft 645130 -dst c:\dump\645130.bin -partition c: -meta
+</pre>
+
+<p>
+For details on the <b><i>ntfscopy</i></b> syntax, refer to the <b><i>ntfscopy</i></b> 
+readme file <a href="http://tzworks.net/prototype_page.php?proto_id=9">[7]</a>.   
+Briefly, the -mft option allows one 
+to specify a source MFT entry to copy from.  The -meta 
+option says to create a separate file (in addition to the 
+copied file) that contains the metadata information about 
+the specified MFT entry.  The metadata file will be created 
+with the same name as the destination file with the 
+appended suffix .meta.txt.  Included in the metadata file 
+are many of the NTFS attributes of the target source file 
+(or MFT entry).  This includes, amongst other things, the 
+<i>cluster run</i> and <i>MACB</i> timestamps.  From the metadata one 
+can see if the MFT sequence number is the same or not (which 
+would be the indication whether the MFT record was assigned 
+to another file or not).</p>  
+</div>
+
+<hr/><!---------------------Eliminating the Duplicates---------------------->
+<h2><a name="nodups">Eliminating the Duplicates</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>
+For those <i>INDX</i> records that have many <i>slack</i> entries, it is 
+not uncommon for there to be quite a few duplicate entries that 
+are parsed and displayed in the output.   Duplicate here means 
+the filename and <i>MACB</i> timestamps are the same, however the 
+location of the entry in the <i>INDX</i> record is different.  For 
+every unique location in the <i>INDX</i> record, <b><i>wisp</i></b> will happily 
+parse the index entry and report its findings to the investigator.  
+This can be quite annoying when some entries have more than a 
+few duplicates and one is trying to wade through a lot of data; 
+especially when carving out entries from <i>slack</i> data on all 
+the directories in an entire volume.</p>  
+
+<p>
+To get rid of duplicates, one can invoke the -nodups switch.  
+This tells <b><i>wisp</i></b> to analyze the data extracted and only report 
+one instance of the entry.   One thing to be aware of when 
+using this option, is that <b><i>wisp</i></b> will internally always analyze 
+valid and <i>slack</i> entries independent of what the user selects 
+as input options.  After all the data is extracted, <b><i>wisp</i></b> will 
+start deciding if there are duplicate entries or not.   It 
+does this by looking at comparing all <i>slack</i> entries with valid 
+entries to see if there is a duplicate, and if not, they are 
+compared to any <i>slack</i> entries that have been marked as non-dups.  
+What this means is, if one runs <b><i>wisp</i></b> and only wants 
+non-duplicate <i>slack</i> entries, some <i>slack</i> entries will not be 
+reported if there are valid entries present that are the same.</p>
+</div>
+
+
+<hr/><!---------------------Output Options---------------------->
+<h2><a name="output_options">Output Options</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<h4>Which Output option yields the most data</h4>
+<p>
+The two output options that give all the metadata available 
+are the default (unstructured) output and the CSV (<font color="red">-csv</font>)
+output.  The other two output options (<font color="red">-csvl2t</font> and 
+<font color="red">-bodyfile</font>) are geared toward generating cross-artifact 
+timelines.   As a result, they are more restrictive in the 
+output fields, and therefore, the metadata that is parsable 
+from these options have some limitations.   Specifically, 
+<b><i>wisp</i></b> makes use of a couple of free-form fields in these 
+last two output options to try to inject as much useful 
+data as possible, but it makes the data in these fields 
+unstructured, and therefore, difficult to parse if trying 
+to post process the results.  Therefore, the best 
+option for metadata that needs to be parsed from <b><i>wisp</i></b> output 
+comes from the <font color="red">-csv</font> option.</p>  
+
+<h4>Two Categories of Slack entries</h4>
+<p>
+The slack entries in the output have comments associated with them.  
+The comments come in 2 categories: (a) entries that have not been deleted 
+and (b) those that have been deleted.</p>  
+
+<p>
+The first case there is a valid and invalid (slack) entry pointing to the 
+same file (one can tell this since the MFT entry number and sequence 
+numbers match up).  The difference, aside from the fact one is in 
+slack space, is something has changed in the metadata from one file 
+to the other.  This could be that <i>MACB</i> timestamps are different,
+or the the size of the file has changed.   <b><i>wisp</i></b> annotates the 
+time modifications with a comment, denoted by <i>[macb]</i> and/or <i>[size]</i>,
+depending whether the MACB times are different or the size is different.
+In the case of timestamps changing, <b><i>wisp</i></b> may put the following: <i>[m.c.]</i>, 
+which translates to the modify timestamp and 'MFT change' 
+timestamps, respectively, as being different than the valid entry.  
+From this, one can get some past data on a file that has gone through 
+some revisions.</p>    
+
+<p>
+For the second case, <b><i>wisp</i></b> 
+just annotates the <i>slack</i> entry as deleted.  The term 
+deleted here is only accurate in the sense that this index 
+entry is no longer part of the directory containing the 
+<i>INDX</i> record(s).  Whether the item was moved to another 
+subdirectory or actually deleted is unknown from the data 
+presented here.</p>  
+
+<h4>Corruption of the Index Entry</h4>
+
+<p>
+In cases where there the slack data is obviously corrupted, <b><i>wisp</i></b> will 
+either leave that field blank if using CSV output or annotate the word 
+&lt;corrupted&gt; if using the default output.</p>
+</div>
+
+<hr/><!---------------------Known Issues---------------------->
+<h2><a name="issues">Known Issues</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>
+For CSV (comma separated values) output, there are restrictions 
+in the characters that are outputted. Since commas are used as a 
+separator, any data that had comma in its name are changed to spaces. 
+For the default (non-csv) output no changes are made to the data.</p>
+</div>
+
+
+<hr/><!---------------------List of Options---------------------->
+<h2><a name="options">List of options</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<table border="1" cellpadding="2" cellspacing="0">
+    <tr bgcolor="yellow">
+        <th>Option</th>
+        <th>Extra</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>-partition</td>
+        <td></td>
+        <td> Extract artifacts from a mounted Windows volume. The syntax is 
+        <font color="red"><i><b>-partition &lt;drive letter&gt;</b></i></font>.</td>
+    </tr>
+    <tr>
+        <td>-drivenum</td>
+        <td></td>
+        <td> Extract artifacts from a mounted disk specified by a drive number and volume offset. The syntax is 
+        <font color="red"><i><b>-drivenum &lt;#&gt; -offset &lt;volume offset&gt;</b></i></font></td>
+    </tr>
+    <tr>
+        <td>-image</td>
+        <td></td>
+        <td> Extract artifacts from a volume specified by an image and volume offset. The syntax is 
+        <font color="red"><i><b>-image &lt;filename&gt; -offset &lt;volume offset&gt;</b></i></font></td>
+    </tr>
+    <tr>
+        <td>-vmdk</td>
+        <td>**</td>
+        <td> Extract artifacts from a VMWare monolithic NTFS formatted volume. The syntax is 
+        <font color="red"><i><b>-vmdk &lt;disk name&gt;</b></i></font>.  For a collection
+        of VMWare disks that include snapshots, one can use the following syntax: 
+         <font color="red"><i><b>-vmdk "disk1 | disk2 | ..."</b></i></font></td>
+    </tr>
+    <tr>
+        <td>-csv</td>
+        <td></td>
+        <td>Outputs the data fields delimited by commas. Since filenames can have commas, to ensure 
+        the fields are uniquely separated, any commas in the filenames get converted to spaces.</td>
+    </tr>    
+    <tr>
+        <td>-csvl2t</td>
+        <td></td>
+        <td>Outputs the data fields in accordance with the log2timeline format.</td>
+    </tr>
+    <tr>
+        <td>-bodyfile</td>
+        <td></td>
+        <td>Outputs the data fields in accordance with the 'body-file' version3 specified in 
+        the SleuthKit. The date/timestamp outputted to the body-file are in terms of UTC.  
+        So if using the body-file in conjunction with the mactime.pl utility, one needs to set 
+        the environment variable TZ=UTC.</td>
+    </tr>
+    <tr>
+        <td>-base10</td>
+        <td></td>
+        <td>Ensure all size/address output is displayed in base-10 format vice hexadecimal format. Default
+        is hexadecimal format.</td>
+    </tr>
+    <tr>
+        <td>-mft</td>
+        <td></td>
+        <td>Extract index metadata given an inode. The syntax is:
+        <font color="red"><i><b>-mft &lt;MFT entry to analyze&gt;</b></i></font>.</td>
+    </tr>
+    <tr>
+        <td>-indxfile</td>
+        <td></td>
+        <td>Process INDX data that may be been extracted from another tool. The syntax is:
+        <font color="red"><i><b>-indxfile &lt;datafile name;&gt;</b></i></font>.</td>
+    </tr>
+     <tr>
+        <td>-path</td>
+        <td></td>
+        <td>Analyze the index entries given a path.  The syntax is:     
+        <font color="red"><i><b>-path &lt;directory to analyze&gt;</b></i></font>.</td>
+    </tr>
+   <tr>
+        <td>-valid</td>
+        <td></td>
+        <td>Extract the metadata from the valid index entries only.</td>
+    </tr>
+    <tr>
+        <td>-slack</td>
+        <td></td>
+        <td>Extract the metadata from the slack index entries only.</td>
+    </tr>
+    <tr>
+        <td>-all</td>
+        <td></td>
+        <td>Pull every index entry found. This includes both valid and invalid (slack) index entries.</td>
+    </tr>
+    <tr>
+        <td>-nodups</td>
+        <td></td>
+        <td>Output unique entries only. Duplicate entries are flagged if the name and 
+        MACB timestamps are the same.</td>
+    </tr>
+    <tr>
+        <td>-username</td>
+        <td></td>
+        <td>Option is used to populate the output records with
+        a specified username. The syntax is <font color="red"><i><b>-username 
+        &lt;name to use&gt;</b></i></font>. </td>
+    </tr>
+    <tr>
+        <td>-hostname</td>
+        <td></td>
+        <td>Option is used to populate the output records with a specified hostname. The syntax
+	 is <font color="red"><i><b>-hostname &lt;name to use&gt;</b></i></font>. </td>
+    </tr>
+
+    <tr>
+        <td>-no_whitespace</td>
+        <td>**</td>
+        <td>Used in conjunction with <font color="red"><i><b>-csv</b></i></font> option 
+        to remove any whitespace between the field  value and the CSV separator.</td>
+    </tr>
+    <tr>
+        <td>-csv_separator</td>
+        <td>**</td>
+        <td>Used in conjunction with the <font color="red"><i><b>-csv</b></i></font> 
+        option to change the CSV separator from the default comma to something else.
+        Syntax is <font color="red"><i><b>-csv_separator "|"</b></i></font> to change
+        the CSV separator to the pipe character.</td>
+    </tr>
+    <tr>
+        <td>-dateformat</td>
+        <td>**</td>
+        <td>Output the date using the specified format. Default behavior is 
+        <font color="red"><i><b>-dateformat "mm/dd/yyyy"</b></i></font>.
+        This allows more flexibility to for a desired format.  For example, one 
+        can use this to show year first, via 
+        <font color="red"><i><b>"yyyy/mm/dd"</b></i></font> or day first, 
+        via <font color="red"><i><b>"dd/mm/yyyy"</b></i></font>, or only show 2 
+        digit years, via the <font color="red"><i><b>"mm/dd/yy"</b></i></font>. The 
+        restriction with this option is the forward slash (/) symbol needs to separate 
+        month, day and year and the month is in digit (1-12) form vice abbreviated 
+        name form. </td>
+    </tr>
+    <tr>
+        <td>-timeformat</td>
+        <td>**</td>
+        <td>Output the time using the specified format. Default behavior is 
+        <font color="red"><i><b>-timeformat "hh:mm:ss.xxx"</b></i></font>
+        One can adjust the format to microseconds, via 
+        <font color="red"><i><b>"hh:mm:ss.xxxxxx"</b></i></font> or nanoseconds, 
+        via <font color="red"><i><b>"hh:mm:ss.xxxxxxxxx"</b></i></font>, or no fractional seconds, via 
+        <font color="red"><i><b>"hh:mm:ss"</b></i></font>. The 
+        restrictions with this option is a the colon (:) symbol needs to separate hours, minutes 
+        and seconds, a period (.) symbol needs to separate the seconds and fractional seconds, and the 
+        repeating symbol 'x' to represent number of fractional seconds. (note: the the fractional 
+        seconds applies only to those time formats that have the appropriate precision available. 
+        The Windows internal filetime has, for example, 100 nsec unit precision available. 
+        The DOS time format and the UNIX 'time_t' format, however, have no fractional seconds). 
+        Some of the times represented by for this tool may use a time format without fractional 
+        seconds and therefore will not show a greater precision beyond seconds when using this 
+        option.</td>
+    </tr>
+    <tr>
+        <td>-quiet</td>
+        <td>**</td>
+        <td>This option suppresses status output during processing. </td>
+    </tr>
+
+</table>
+
+<p>The options labeled as 'Extra' require a separate license for them to be unlocked.</p>
+
+</div>
+
+
+
+<hr/><!---------------------Authentication and License File---------------------->
+<h2><a name="auth">Authentication and License File</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<p>This tool has authentication built into the binary.  There are two authentication 
+mechanisms:  
+(a) the digital certificate embedded into the binary and (b) the runtime authentication.   
+For the first method, only the Windows and Mac OS-X (if available) versions have been 
+signed by an X-509 digital code signing certificate, which is validated by Windows 
+(or OS-X) during operation.  If the binary has been tampered with, the digital 
+certificate will be invalidated.</p>
+
+<p>For the second (runtime authentication) method, the authentication does two things: 
+(a) validates that the tool has a valid license and (b) validates the 
+tool's binary has not been corrupted.   The license needs to be in the same directory 
+of the tool for it to authenticate.   Furthermore any modification to the license, 
+either to its name or contents, will invalidate the license.   The runtime binary 
+validation hashes the executable that is running and fails the authentication if it 
+detects any modifications. </p>
+
+<h4><i>Limited</i> vice <i>Full</i> in the tool's output banner</h4>
+
+<p>The tools from TZWorks tools will output header information about the tool's version
+and whether it is running in <i>limited</i> or <i>full</i> mode.  This is directly related
+to what version of a license the tool authenticates with.   The <i>limited</i> keyword 
+indicates some functionality of the tool is not available, and the <i>full</i> keyword 
+indicates all the functionality is available.  The lacking functionality in the <i>limited</i>
+version may mean one or more of the following: (a) certain options may not be available, 
+(b) certain data may not be outputted in the parsed results, and (c) the license has a 
+finite lifetime before expiring.</p>
+</div>
+
+
+<hr/><!---------------------Version history---------------------->
+<h2><a name="version_history">Version history</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<ul type="square">
+    <li>11/18/2013 - v0.20 - tweaked authentication options for demo license</li>
+    <li>10/26/2013 - v0.19 - updated internal libraries</li>
+	<li>10/09/2013 - v0.18 - updated internal libraries with bug fixes.</li>
+    <li>08/22/2013 - v0.17 - routine library maintenance updates</li>
+    <li>07/05/2013 - v0.16 - Updated the authentication routine and other fixes</li>
+    <li>06/24/2013 - v0.15 - fixed bug that limits size of INDX data chunk that can be processed. </li>
+    <li>02/25/2013 - v0.14 - fixed bug that occurs on certain strings </li>
+    <li>11/03/2012 - v0.13 - maintenance update of core libraries w/ bug fixes </li>
+    <li>10/30/2012 - v0.12 - fixed bug w/ NTFS inadvertently added in previous version</li>
+    <li>09/24/2012 - v0.11 - added hash check to ensure binary integrity</li>
+    <li>07/17/2012 - v0.10 - 1st prototype released for testing purposes</li>
+</ul>
+</div>
+
+<hr/><!---------------------References---------------------->
+<h2><a name="references">References</a>
+<font size="2"><a href="#index"> (top) </a></font></h2>
+
+<div>
+<ol>
+    <li><a href="http://www.ntfs.com/">http://www.ntfs.com</a> website</li>
+    <li><a href="http://en.wikipedia.org/wiki/NTFS">http://en.wikipedia.org/wiki/NTFS</a> website</li>
+    <li>Brian Carrier's book, File System Forensic Analysis, sections on NTFS</li>
+    <li>Willi Ballenthin article on <a href="http://www.williballenthin.com/forensics/indx/index.html">NTFS INDX parsing</a>. </li>
+    <li>Getting to know your NTFS INDX Records presented May 3, 2012 on 
+        <a href="http://writeblocked.org/dfironline.html">DFIRonline</a> by Willi Ballenthin</li>
+    <li><b><i>ntfswalk</i></b> tool. <a href="http://tzworks.net/prototype_page.php?proto_id=12">http://tzworks.net/prototype_page.php?proto_id=12</a>, TZWorks LLC.</li>
+    <li><b><i>ntfscopy</i></b> tool. <a href="http://tzworks.net/prototype_page.php?proto_id=9">http://tzworks.net/prototype_page.php?proto_id=9</a>, TZWorks LLC.</li>
+    <li>SleuthKit Body-file format, <a href="http://wiki.sleuthkit.org">http://wiki.sleuthkit.org</a></li>
+    <li>Log2timeline CSV format, <a href="http://log2timeline.net">http://log2timeline.net/</a></li>
+    <li>VMWare Virtual Disk Format 1.1 Technical Note, <a href="http://www.vmware.com">http://www.vmware.com</a></li>
+</ol>
+</div>
+
+<hr/><!---------------------Copyright---------------------->
+<h5 align="right">Copyright &copy; TZWorks, LLC, All Rights Reserved <br />
+Contact Info: <a href="mailto:info@tzworks.net">info&#64;tzworks.net</a></h5>
+
+<p></p>
+<hr />
+<p></p>
+</body>
+
+</html>
+
+LICENSE_AUTHENTICATION
+mZ23Uhbd+s4ZYunV7Q6+gdQ1zidxe97oUmMKdfj9a+LREwoc6EtcNY3vh2qPyJetC//HX3oBBAQZ
+eosin+bAmYazJ5k+YsOYE8EPnsQFPr5R6BTwIpJj31MwZ4AkapcG356Tz41JI1/wgznooU6wEB7H
+pjNrZg9+ODJ5KY038qbWKcbYdfb9DJcozvP+7jKeV0TdfPt2RcOCLl3+2LZ9PWTTv3N5iLS6PU6K
+c9frjQ6xIoY0mb2z3yNymykE4YGPX7Qmw+tddFK4hS6MEjFtFr81zHu5ZDJE4B9MtfITV01dqx/e
+Nf2Xt9VXGE8yGd4HV6DTYpf7b01hHQB0qcTSRQ==
+ 
