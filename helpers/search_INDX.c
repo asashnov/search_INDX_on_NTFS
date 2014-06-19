@@ -1,3 +1,7 @@
+/* This is auxiliary utility. You should not to run it directly.
+ */
+
+
 // we have to support big disks
 #define _FILE_OFFSET_BITS 64
 

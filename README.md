@@ -10,7 +10,7 @@ https://tzworks.net/download_links.php
 
 Windows INDX Slack Parser (wisp)
 (this project was tested with wisp32.v.0.20.lin.tar.gz)
-You have to extract content of this archive into project's folder.
+You have to extract content of this archive into '3rdparty' subfolder.
 
 
 How to use

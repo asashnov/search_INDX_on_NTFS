@@ -3,6 +3,9 @@
 import sys
 import tempfile
 import subprocess
+import argparse
+
+
 
 image_file=""
 index_file=""
@@ -89,5 +92,10 @@ def do_job():
 
 
 if __name__ == "__main__":
-    if args_parse() and sanity_checks():
-        do_job()
+    parser = argparse.ArgumentParser(description="Search and re-construct directories structure from broken NTFS disk image")
+    parser.add_argument('--image', help="Disk image file", action='store', dest='image', required=True)
+    args = parser.parse_args()
+
+    csvfile = get_csv_for_disk(args.image)
+
+    parse_tree(cvsfile)
