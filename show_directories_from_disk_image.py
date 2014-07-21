@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #
 import sys
+import platform
 import tempfile
 import subprocess
 import argparse
@@ -14,25 +15,10 @@ index_file=""
 SEC_SIZE=512
 
 # use 64 on a 64-bit system
-WISP="./wisp32"
-
-
-def args_parse():
-    global image_file, index_file
-
-    if len(sys.argv) != 3:
-        print >>sys.stderr, """Error: invalid usage.
-Usage: %s <NTFS_disk_image>  <INDX_list_file>
-
-Where <NTFS_disk_image> is a device file or dd/ddrescue image file and
-<INDX_list_file> is a text file with one number per line with 512 bytes sectors
-starting with 'INDX' text (NTFS directory index file)
-        """
-        return False
-
-    image_file = sys.argv[1]
-    index_file = sys.argv[2]
-    return True
+if platform.machine().endswith('64'):
+    WISP="./3rdparty/64/wisp64"
+else:
+    WISP="./3rdparty/32/wisp32"
 
 
 def sanity_checks():
@@ -56,9 +42,41 @@ class IndexList:
         else:
             raise StopIteration
 
+
 def parse_wisp_output(output_filename):
     print "parse wisp output"
     return
+
+
+# Gets image file and creates index file for it.
+#
+def get_index_file(image_file):
+
+    index_file = image_file + ".idx"
+
+    if os.path.exists(index_file):
+        return index_file
+
+    helper_exe = "helpers/search_INDX"
+
+    p = subprocess.Popen(
+        shell=False,
+        args = [ helper_exe, image_file ],
+        stdout = subprocess.PIPE
+        )
+
+    fp = open(index_file, "w")
+    for line in p.stdout:
+        fp.write(line)
+    fp.close()
+    return index_file
+
+
+def get_csv_for_disk(image_file):
+
+    index_file = get_index_file(image_file)
+
+
 
 
 
